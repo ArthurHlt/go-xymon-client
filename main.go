@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/urfave/cli"
+	"github.com/mitchellh/colorstring"
 	"os"
 	xymclient "github.com/ArthurHlt/go-xymon-client/client"
 	"net"
@@ -142,7 +143,7 @@ func pingWithoutPrint(c *cli.Context) (string, error) {
 	if resp == "" {
 		return "", cli.NewExitError("ERROR: The server is not answering. Probably connection has been shut down by tier (firewall can block access).", 1)
 	}
-	return resp, nil
+	return formatRepsponse(resp), nil
 }
 func ping(c *cli.Context) error {
 	resp, err := pingWithoutPrint(c)
@@ -152,6 +153,9 @@ func ping(c *cli.Context) error {
 	fmt.Print(resp)
 	return nil
 }
+func formatRepsponse(resp string) string {
+	return colorstring.Color("\n[blue]RESPONSE: [reset]" + resp)
+}
 func showResponse(resp string, err error) error {
 	if nerr, ok := err.(net.Error); ok && nerr.Timeout() {
 		fmt.Println("We had a timeout during getting response. No response will be provided.")
@@ -160,7 +164,8 @@ func showResponse(resp string, err error) error {
 	if _, ok := err.(net.Error); !ok && err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
-	fmt.Print(resp)
+
+	fmt.Print(formatRepsponse(resp))
 	return nil
 }
 func flagsToMessageTest(c *cli.Context) xymclient.MessageTest {
