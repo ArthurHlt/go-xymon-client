@@ -4,10 +4,11 @@ A client for [xymon](http://xymon.sourceforge.net/) wrote for golang.
 
 See usage in [/client/client.go](/client/client.go).
 
-This small client have only 3 verbs created:
+This small client have only 4 verbs created:
 - ping
 - query
 - status
+- event (**This should be for now (9th of december, 2017) not available on your xymon. This coming from a fork not yet merged**)
 
 No other verbs will be created, if you want more pull requests are accepted.
 
