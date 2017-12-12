@@ -18,6 +18,10 @@ const (
 	CYellow colorTest = "yellow"
 )
 
+func (c colorTest) String() string {
+	return string(c)
+}
+
 func ParseColorString(s string) (colorTest, error) {
 	color := colorTest(s)
 	switch color {
