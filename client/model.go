@@ -23,7 +23,7 @@ func (c colorTest) String() string {
 }
 
 func ParseColorString(s string) (colorTest, error) {
-	color := colorTest(s)
+	color := colorTest(strings.ToLower(s))
 	switch color {
 	case CNan, CInf, CClear, CGreen, CRed, CYellow:
 		return color, nil
