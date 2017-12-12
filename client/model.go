@@ -1,24 +1,34 @@
 package client
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 )
 
-type ColorTest string
+type colorTest string
 
 const (
-	CNan    ColorTest = "blue"
-	CInf    ColorTest = "purple"
-	CClear  ColorTest = "clear"
-	CGreen  ColorTest = "green"
-	CRed    ColorTest = "red"
-	CYellow ColorTest = "yellow"
+	CNan    colorTest = "blue"
+	CInf    colorTest = "purple"
+	CClear  colorTest = "clear"
+	CGreen  colorTest = "green"
+	CRed    colorTest = "red"
+	CYellow colorTest = "yellow"
 )
 
+func ParseColorString(s string) (colorTest, error) {
+	color := colorTest(s)
+	switch color {
+	case CNan, CInf, CClear, CGreen, CRed, CYellow:
+		return color, nil
+	}
+	return colorTest(""), errors.New("Color " + s + " doesn't exists.")
+}
+
 type MessageTest struct {
-	Color       ColorTest // optional when querying
+	Color       colorTest // optional when querying
 	Host        string
 	Name        string
 	Text        string // optional when querying
@@ -53,7 +63,7 @@ func (message MessageTest) String() string {
 type EventTest struct {
 	Name         string
 	Id           string // event id (this is required)
-	Color        ColorTest
+	Color        colorTest
 	Host         string
 	Activation   time.Time // When activate the event (default: now)
 	Ephemeral    bool      // set to true to say that event can be destroyed

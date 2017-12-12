@@ -170,7 +170,10 @@ func status(c *cli.Context) error {
 	if c.String("host") == "" || c.String("name") == "" || c.String("text") == "" || c.String("color") == "" {
 		return cli.NewExitError("ERROR: You must set host, name, text and color.", 1)
 	}
-	m := flagsToMessageTest(c)
+	m, err := flagsToMessageTest(c)
+	if err != nil {
+		return err
+	}
 	client := getClient(c)
 	resp, err := client.Status(m)
 	return showResponse(resp, err)
@@ -187,7 +190,10 @@ func event(c *cli.Context) error {
 	if (c.String("name") == "" || c.String("text") == "" || c.String("color") == "") && !c.Bool("remove") {
 		return cli.NewExitError("ERROR: You must set text/id/color or mark as remove.", 1)
 	}
-	t := flagsToEventTest(c)
+	t, err := flagsToEventTest(c)
+	if err != nil {
+		return err
+	}
 	fmt.Println(t)
 	client := getClient(c)
 	resp, err := client.Event(t)
@@ -201,7 +207,10 @@ func query(c *cli.Context) error {
 	if c.String("host") == "" || c.String("name") == "" {
 		return cli.NewExitError("ERROR: You must set host and name.", 1)
 	}
-	m := flagsToMessageTest(c)
+	m, err := flagsToMessageTest(c)
+	if err != nil {
+		return err
+	}
 	client := getClient(c)
 	resp, err := client.Query(m)
 	return showResponse(resp, err)
@@ -243,20 +252,28 @@ func showResponse(resp string, err error) error {
 	fmt.Print(formatRepsponse(resp))
 	return nil
 }
-func flagsToMessageTest(c *cli.Context) xymclient.MessageTest {
+func flagsToMessageTest(c *cli.Context) (xymclient.MessageTest, error) {
+	color, err := xymclient.ParseColorString(c.String("color"))
+	if err != nil {
+		return xymclient.MessageTest{}, err
+	}
 	return xymclient.MessageTest{
-		Color:    xymclient.ColorTest(c.String("color")),
+		Color:    color,
 		Host:     c.String("host"),
 		Name:     c.String("name"),
 		Text:     c.String("text"),
 		Group:    c.String("group"),
 		Lifetime: c.String("lifetime"),
-	}
+	}, nil
 }
 
-func flagsToEventTest(c *cli.Context) xymclient.EventTest {
+func flagsToEventTest(c *cli.Context) (xymclient.EventTest, error) {
+	color, err := xymclient.ParseColorString(c.String("color"))
+	if err != nil {
+		return xymclient.EventTest{}, err
+	}
 	evt := xymclient.EventTest{
-		Color:        xymclient.ColorTest(c.String("color")),
+		Color:        color,
 		Host:         c.String("host"),
 		Name:         c.String("name"),
 		Text:         c.String("text"),
@@ -271,5 +288,5 @@ func flagsToEventTest(c *cli.Context) xymclient.EventTest {
 	if c.Duration("expiration") != time.Duration(0) {
 		evt.Expiration = time.Now().Add(c.Duration("expiration"))
 	}
-	return evt
+	return evt, nil
 }
