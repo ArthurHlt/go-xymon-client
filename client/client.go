@@ -18,15 +18,22 @@ const (
 	eventRequest  typeRequest = "event"
 )
 
-type Client struct {
+type Client interface {
+	Status(MessageTest) (string, error)
+	Query(MessageTest) (string, error)
+	Ping() (string, error)
+	Event(EventTest) (string, error)
+}
+
+type XymonClient struct {
 	Host            string
 	Port            int
 	FQDNEnabled     bool
 	TimeoutInSecond int
 }
 
-func NewClient(hostname string) *Client {
-	client := &Client{
+func NewClient(hostname string) Client {
+	c := &XymonClient{
 		FQDNEnabled:     true,
 		Host:            hostname,
 		Port:            1984,
@@ -34,32 +41,32 @@ func NewClient(hostname string) *Client {
 	}
 	urlSplit := strings.Split(hostname, ":")
 	if len(urlSplit) == 2 {
-		client.Host = urlSplit[1]
+		c.Host = urlSplit[1]
 		port, _ := strconv.Atoi(urlSplit[2])
-		client.Port = port
+		c.Port = port
 	}
-	return client
+	return c
 }
-func NewClientFQDNDisabled(hostname string) *Client {
-	client := NewClient(hostname)
-	client.FQDNEnabled = false
-	return client
+func NewClientFQDNDisabled(hostname string) Client {
+	c := NewClient(hostname)
+	c.(*XymonClient).FQDNEnabled = false
+	return c
 }
-func (c Client) Status(message MessageTest) (string, error) {
+func (c XymonClient) Status(message MessageTest) (string, error) {
 	message.FQDNEnabled = c.FQDNEnabled
 	return c.sendRequest(statusRequest, message)
 }
-func (c Client) Query(message MessageTest) (string, error) {
+func (c XymonClient) Query(message MessageTest) (string, error) {
 	message.FQDNEnabled = c.FQDNEnabled
 	return c.sendRequest(queryRequest, c.filterMessageForQuery(message))
 }
-func (c Client) Ping() (string, error) {
+func (c XymonClient) Ping() (string, error) {
 	return c.sendRequest(pingRequest, "")
 }
-func (c Client) Event(evt EventTest) (string, error) {
+func (c XymonClient) Event(evt EventTest) (string, error) {
 	return c.sendRequest(eventRequest, evt)
 }
-func (c Client) sendRequest(req typeRequest, data interface{}) (string, error) {
+func (c XymonClient) sendRequest(req typeRequest, data interface{}) (string, error) {
 	conn, err := net.DialTimeout("tcp", c.Host+":"+strconv.Itoa(c.Port), time.Duration(c.TimeoutInSecond)*time.Second)
 	if err != nil {
 		return "", err
@@ -75,7 +82,7 @@ func (c Client) sendRequest(req typeRequest, data interface{}) (string, error) {
 
 	return bufio.NewReader(conn).ReadString('\n')
 }
-func (c Client) filterMessageForQuery(message MessageTest) MessageTest {
+func (c XymonClient) filterMessageForQuery(message MessageTest) MessageTest {
 	return MessageTest{
 		Name:  message.Name,
 		Host:  message.Host,

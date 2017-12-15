@@ -153,8 +153,8 @@ func main() {
 
 	app.Run(os.Args)
 }
-func getClient(c *cli.Context) *xymclient.Client {
-	var client *xymclient.Client
+func getClient(c *cli.Context) xymclient.Client {
+	var client xymclient.Client
 	if c.GlobalBool("no-fqdn") {
 		client = xymclient.NewClientFQDNDisabled(c.GlobalString("target"))
 	} else {
