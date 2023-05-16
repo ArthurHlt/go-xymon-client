@@ -24,7 +24,7 @@ type Client interface {
 	Query(MessageTest) (string, error)
 	Ping() (string, error)
 	Event(EventTest) (string, error)
-	EventDelete(xymonclient.EventTest) (string, error)
+	EventDelete(EventTest) (string, error)
 }
 
 type XymonClient struct {
@@ -68,7 +68,7 @@ func (c XymonClient) Ping() (string, error) {
 func (c XymonClient) Event(evt EventTest) (string, error) {
 	return c.sendRequest(eventRequest, evt)
 }
-func (c XymonClient) EventDelete(evt xymonclient.EventTest) (string, error) {
+func (c XymonClient) EventDelete(evt EventTest) (string, error) {
 	return c.sendRequest(eventDeleteRequest, evt)
 }
 func (c XymonClient) sendRequest(req typeRequest, data interface{}) (string, error) {
