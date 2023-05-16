@@ -16,6 +16,7 @@ const (
 	queryRequest  typeRequest = "query"
 	pingRequest   typeRequest = "ping"
 	eventRequest  typeRequest = "event"
+	eventDeleteRequest  typeRequest = "event eventdelete\n"
 )
 
 type Client interface {
@@ -23,6 +24,7 @@ type Client interface {
 	Query(MessageTest) (string, error)
 	Ping() (string, error)
 	Event(EventTest) (string, error)
+	EventDelete(xymonclient.EventTest) (string, error)
 }
 
 type XymonClient struct {
@@ -65,6 +67,9 @@ func (c XymonClient) Ping() (string, error) {
 }
 func (c XymonClient) Event(evt EventTest) (string, error) {
 	return c.sendRequest(eventRequest, evt)
+}
+func (c XymonClient) EventDelete(evt xymonclient.EventTest) (string, error) {
+	return c.sendRequest(eventDeleteRequest, evt)
 }
 func (c XymonClient) sendRequest(req typeRequest, data interface{}) (string, error) {
 	conn, err := net.DialTimeout("tcp", c.Host+":"+strconv.Itoa(c.Port), time.Duration(c.TimeoutInSecond)*time.Second)
