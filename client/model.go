@@ -7,32 +7,32 @@ import (
 	"time"
 )
 
-type colorTest string
+type ColorTest string
 
 const (
-	CNan    colorTest = "blue"
-	CInf    colorTest = "purple"
-	CClear  colorTest = "clear"
-	CGreen  colorTest = "green"
-	CRed    colorTest = "red"
-	CYellow colorTest = "yellow"
+	CNan    ColorTest = "blue"
+	CInf    ColorTest = "purple"
+	CClear  ColorTest = "clear"
+	CGreen  ColorTest = "green"
+	CRed    ColorTest = "red"
+	CYellow ColorTest = "yellow"
 )
 
-func (c colorTest) String() string {
+func (c ColorTest) String() string {
 	return string(c)
 }
 
-func ParseColorString(s string) (colorTest, error) {
-	color := colorTest(strings.ToLower(s))
+func ParseColorString(s string) (ColorTest, error) {
+	color := ColorTest(strings.ToLower(s))
 	switch color {
 	case CNan, CInf, CClear, CGreen, CRed, CYellow:
 		return color, nil
 	}
-	return colorTest(""), errors.New("Color " + s + " doesn't exists.")
+	return ColorTest(""), errors.New("Color " + s + " doesn't exists.")
 }
 
 type MessageTest struct {
-	Color       colorTest // optional when querying
+	Color       ColorTest // optional when querying
 	Host        string
 	Name        string
 	Text        string // optional when querying
@@ -67,7 +67,7 @@ func (message MessageTest) String() string {
 type EventTest struct {
 	Name         string
 	Id           string // event id (this is required)
-	Color        colorTest
+	Color        ColorTest
 	Host         string
 	Activation   time.Time // When activate the event (default: now)
 	Ephemeral    bool      // set to true to say that event can be destroyed
